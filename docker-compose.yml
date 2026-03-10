@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: advocacia_db
+    restart: always
+    environment:
+      POSTGRES_DB: advocacia
+      POSTGRES_USER: advocacia
+      POSTGRES_PASSWORD: advocacia@ad
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U advocacia"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend:
+    build: ./backEnd
+    container_name: advocacia_backend
+    restart: always
+    ports:
+      - "3333:3333"
+    environment:
+      DATABASE_URL: postgresql://advocacia:advocacia%40ad@postgres:5432/advocacia?schema=public
+      JWT_SECRET: "sua_chave_secreta_segura_aqui"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontEnd
+      args:
+        VITE_API_URL: /api
+    container_name: advocacia_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

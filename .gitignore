@@ -1,0 +1,17 @@
+# Arquivos de log
+logs
+*.log
+npm-debug.log*
+
+# Dependências
+node_modules
+
+# Arquivos de ambiente (NUNCA comitar senhas!)
+.env
+
+# Pasta de build do frontend
+frontEnd/dist
+
+# Dados do Docker
+data/
+postgres_data/

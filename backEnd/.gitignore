@@ -1,0 +1,38 @@
+# Node modules
+node_modules/
+
+# Prisma
+generated/
+generated/prisma/
+prisma/migrations/
+*.db
+*.db-journal
+
+# Uploads
+uploads/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build
+dist/
+build/
+
+# Docker
+docker-compose.override.yml

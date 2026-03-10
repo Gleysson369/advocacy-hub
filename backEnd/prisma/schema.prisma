@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id       String  @id @default(uuid())
+  name     String?
+  email    String  @unique
+  password String
+  role     String  @default("user")
+  active   Boolean @default(true)
+
+  // Perfil profissional
+  oab       String?
+  oab_uf    String?
+  cpf       String?
+  phone     String?
+  specialty String?
+  office    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clients      Client[]
+  processes    Process[]
+  appointments Appointment[]
+  petitions    Petition[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Client {
+  id      String  @id @default(uuid())
+  name    String
+  email   String?
+  phone   String?
+  cpf     String?
+  cnpj    String?
+  documentPath String?
+
+  address String?
+  city    String?
+  state   String?
+  notes   String? @db.Text
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appointments Appointment[]
+  processes    Process[]
+  petitions    Petition[]
+
+  @@unique([cpf, userId])
+  @@unique([cnpj, userId])
+}
+
+model Process {
+  id            String @id @default(uuid())
+  processNumber String
+  court         String
+  type          String
+  status        String @default("open")
+  documentPath  String?
+
+  hearingDate   DateTime
+  caseValue     Decimal  @db.Decimal(30, 15)
+  internalNotes String   @db.Text
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appointments Appointment[]
+  petitions    Petition[]
+
+  @@unique([processNumber, userId])
+}
+
+model Appointment {
+  id String @id @default(uuid())
+
+  title       String
+  description String?
+  date        DateTime
+
+  status    AppointmentStatus @default(SCHEDULED)
+  eventType String?
+  location  String?
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  clientId  String?
+  client    Client? @relation(fields: [clientId], references: [id])
+
+  processId String?
+  process   Process? @relation(fields: [processId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Petition {
+  id            String         @id @default(uuid())
+  title         String
+  defendant     String
+
+  addressing String? @db.Text
+  facts      String? @db.Text
+  legalBasis String? @db.Text
+
+  caseValue       Decimal? @db.Decimal(15, 2)
+  closingLocation String?
+
+  description    String? @db.Text
+  type           PetitionType
+  status         PetitionStatus @default(DRAFT)
+  fileUrl        String?
+  protocolNumber String?
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  processId String?
+  process   Process? @relation(fields: [processId], references: [id])
+
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELED
+  NO_SHOW
+}
+
+enum PetitionStatus {
+  DRAFT
+  PENDING
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum PetitionType {
+  INITIAL_PETITION
+  PETITION
+  RECOURSE
+  EVIDENCE
+  CONTESTATION
+  REPLY
+  APPEAL
+  MANIFESTATION
+  OTHER
+}

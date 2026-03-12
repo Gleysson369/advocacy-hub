@@ -3,16 +3,19 @@ FROM node:20
 WORKDIR /app
 COPY . .
 
-# Instala e builda o Front
+# 1. Build do FrontEnd
 WORKDIR /app/frontEnd
 RUN npm install
 RUN npm run build
 
-# Instala o Back
+# 2. Configuração do BackEnd
 WORKDIR /app/backEnd
 RUN npm install
 
+# --- ADICIONE ESTA LINHA AQUI ---
+RUN npx prisma generate
+# -------------------------------
+
 EXPOSE 3000
 
-# O seu BackEnd precisa estar configurado para "servir" a pasta do Front
 CMD ["npm", "start"]

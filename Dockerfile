@@ -1,18 +1,18 @@
 FROM node:20
 
 WORKDIR /app
-
-# 1. Copia tudo para dentro do container
 COPY . .
 
-# 2. Entra na pasta onde o package.json realmente está
-# Se o seu servidor principal estiver no backEnd, use:
-WORKDIR /app/backEnd
+# Instala e builda o Front
+WORKDIR /app/frontEnd
+RUN npm install
+RUN npm run build
 
-# 3. Agora o npm install vai funcionar porque ele achará o arquivo
+# Instala o Back
+WORKDIR /app/backEnd
 RUN npm install
 
 EXPOSE 3000
 
-# 4. Inicia o servidor de dentro da pasta backEnd
+# O seu BackEnd precisa estar configurado para "servir" a pasta do Front
 CMD ["npm", "start"]

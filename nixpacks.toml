@@ -1,0 +1,26 @@
+# nixpacks.toml
+# Place this file in the root of your repository.
+# This configuration is for deploying your backend application.
+
+# Use a specific version of Node.js
+[providers]
+node = "20"
+
+# Define the build phase. These commands run from the project root.
+[phases.build]
+cmds = [
+    # Install dependencies inside the backEnd directory.
+    # Using 'npm ci' is faster and more reliable for builds.
+    # It requires a package-lock.json file to be committed.
+    "npm ci --prefix backEnd",
+    # Generate the Prisma client. The schema path is relative to the root.
+    "npx prisma generate --schema=./backEnd/prisma/schema.prisma",
+    # Run the build script defined in backEnd/package.json
+    "npm run build --prefix backEnd"
+]
+
+# Define the start phase. This command also runs from the project root.
+[start]
+# Start the application by running the compiled JavaScript file.
+# Adjust 'dist/server.js' if your output directory or entry file is different.
+command = "node backEnd/dist/server.js"

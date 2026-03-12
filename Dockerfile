@@ -4,4 +4,4 @@ WORKDIR /app
 
 COPY . .
 
-RUN docker compose up --build
+CMD ["npm", "start"]
